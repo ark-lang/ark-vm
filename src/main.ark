@@ -14,12 +14,12 @@ struct VirtualMachine {
     program_len: s32,
 }
 
-func fetch(vm: VirtualMachine): s32 {
-    instr: s32 = vm.program[vm.ip];
+func fetch(vm: ^VirtualMachine): s32 {
+    instr: s32 = (^vm).program[vm.ip];
     return instr;
 }
 
-func eval(vm: VirtualMachine, instr: s32) {
+func eval(vm: ^VirtualMachine, instr: s32) {
     if instr == HLT {
         vm.running = false;
     }
@@ -66,7 +66,7 @@ func main(): int {
     vm.stack = [ 0, 0, 0, 0, 0 ];
 
     for vm.running && vm.ip <= vm.program_len {
-        eval(vm, fetch(vm));
+        eval(&vm, fetch(&vm));
         vm.ip = vm.ip + 1;
     }
 
