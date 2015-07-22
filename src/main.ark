@@ -11,11 +11,10 @@ struct VirtualMachine {
     ip: s32,
     program: []s32,
     stack: []s32,
-    program_len: s32,
 }
 
 func fetch(vm: ^VirtualMachine): s32 {
-    instr: s32 = (^vm).program[vm.ip];
+    instr: s32 = vm.program[vm.ip];
     return instr;
 }
 
@@ -48,7 +47,7 @@ func eval(vm: ^VirtualMachine, instr: s32) {
 
         b := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
-        
+
         result := a + b;
         C::printf("result is %d\n", result);
         vm.sp = vm.sp + 1;
@@ -60,12 +59,11 @@ func main(): int {
     vm: VirtualMachine;
     vm.running = true;
     vm.program = [ PSH, 5, PSH, 5, ADD, POP, HLT ];
-    vm.program_len = cast(s32, sizeof(vm.program) / sizeof(vm.program[0]));
     vm.ip = 0;
     vm.sp = 0;
     vm.stack = [ 0, 0, 0, 0, 0 ];
 
-    for vm.running && vm.ip <= vm.program_len {
+    for vm.running {
         eval(&vm, fetch(&vm));
         vm.ip = vm.ip + 1;
     }
