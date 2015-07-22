@@ -2,8 +2,9 @@
 
 PSH: s32 = 0;
 ADD: s32 = 1;
-POP: s32 = 2;
-HLT: s32 = 3;
+SUB: s32 = 2;
+POP: s32 = 3;
+HLT: s32 = 4;
 
 struct VirtualMachine {
     running: bool,
@@ -23,42 +24,50 @@ func eval(vm: ^VirtualMachine, instr: s32) {
         vm.running = false;
     }
     else if instr == PSH {
-        C::printf("fuck psh %d\n", vm.ip);
-
         vm.ip = vm.ip + 1;
         vm.sp = vm.sp + 1;
-        C::printf("sp at psh is %d\n", vm.sp);
+        C::printf("PSH sp: %d\n", vm.sp);
         vm.stack[vm.sp] = vm.program[vm.ip];
     }
     else if instr == POP {
-        C::printf("fuck p\n");
-
         val := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
-        C::printf("popped %d\n", val);
+        C::printf("POP result: %d\n", val);
     }
     else if instr == ADD {
-        C::printf("fuck a %d\n", vm.sp);
-
         a := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
-
-        C::printf("fuck b %d\n", vm.sp);
 
         b := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
 
         result := a + b;
-        C::printf("result is %d\n", result);
+        C::printf("ADD result: %d\n", result);
         vm.sp = vm.sp + 1;
         vm.stack[vm.sp] = result;
+    }
+    else if instr == SUB {
+            a := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
+
+            b := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
+
+            result := b - a;
+            C::printf("SUB result: %d\n", result);
+            vm.sp = vm.sp + 1;
+            vm.stack[vm.sp] = result;
+    }
+    else {
+        C::printf("unimplemented instr\n");
+        ^(^int(0)) = 0; // cause a segfault
     }
 }
 
 func main(): int {
     vm: VirtualMachine;
     vm.running = true;
-    vm.program = [ PSH, 5, PSH, 5, ADD, POP, HLT ];
+    vm.program = [ PSH, 5, PSH, 5, ADD, PSH, 7, SUB, POP, HLT ];
     vm.ip = 0;
     vm.sp = 0;
     vm.stack = [ 0, 0, 0, 0, 0 ];
