@@ -1,10 +1,11 @@
 [c] func printf(fmt: str, ...): int;
 
-PSH: s32 = 0;
-ADD: s32 = 1;
-SUB: s32 = 2;
-POP: s32 = 3;
-HLT: s32 = 4;
+NOP: s32 = 0;
+HLT: s32 = 2;
+PSH: s32 = 3;
+POP: s32 = 4;
+ADD: s32 = 5;
+SUB: s32 = 6;
 
 struct VirtualMachine {
     running: bool,
@@ -20,7 +21,10 @@ func fetch(vm: ^VirtualMachine): s32 {
 }
 
 func eval(vm: ^VirtualMachine, instr: s32) {
-    if instr == HLT {
+    if instr == NOP {
+        return;
+    }
+    else if instr == HLT {
         vm.running = false;
     }
     else if instr == PSH {
