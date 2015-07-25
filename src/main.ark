@@ -1,11 +1,12 @@
 [c] func printf(fmt: str, ...): int;
 
-NOP: s32 = 0;
-HLT: s32 = 2;
-PSH: s32 = 3;
-POP: s32 = 4;
-ADD: s32 = 5;
-SUB: s32 = 6;
+enum InstructionSet {
+    HLT,
+    PSH,
+    POP,
+    ADD,
+    SUB
+}
 
 struct VirtualMachine {
     running: bool,
@@ -21,24 +22,20 @@ func fetch(vm: ^VirtualMachine): s32 {
 }
 
 func eval(vm: ^VirtualMachine, instr: s32) {
-    if instr == NOP {
-        return;
-    }
-    else if instr == HLT {
+    if instr == s32(InstructionSet::HLT) {
         vm.running = false;
     }
-    else if instr == PSH {
+    else if instr == s32(InstructionSet::PSH) {
         vm.ip = vm.ip + 1;
         vm.sp = vm.sp + 1;
-        C::printf("PSH sp: %d\n", vm.sp);
         vm.stack[vm.sp] = vm.program[vm.ip];
     }
-    else if instr == POP {
+    else if instr == s32(InstructionSet::POP) {
         val := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
         C::printf("POP result: %d\n", val);
     }
-    else if instr == ADD {
+    else if instr == s32(InstructionSet::ADD) {
         a := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
 
@@ -50,28 +47,35 @@ func eval(vm: ^VirtualMachine, instr: s32) {
         vm.sp = vm.sp + 1;
         vm.stack[vm.sp] = result;
     }
-    else if instr == SUB {
-            a := vm.stack[vm.sp];
-            vm.sp = vm.sp - 1;
+    else if instr == s32(InstructionSet::SUB) {
+        a := vm.stack[vm.sp];
+        vm.sp = vm.sp - 1;
 
-            b := vm.stack[vm.sp];
-            vm.sp = vm.sp - 1;
+        b := vm.stack[vm.sp];
+        vm.sp = vm.sp - 1;
 
-            result := b - a;
-            C::printf("SUB result: %d\n", result);
-            vm.sp = vm.sp + 1;
-            vm.stack[vm.sp] = result;
+        result := b - a;
+        C::printf("SUB result: %d\n", result);
+        vm.sp = vm.sp + 1;
+        vm.stack[vm.sp] = result;
     }
     else {
         C::printf("unimplemented instr\n");
-        ^(^int(0)) = 0; // cause a segfault
     }
 }
 
 func main(): int {
     vm: VirtualMachine;
     vm.running = true;
-    vm.program = [ PSH, 5, PSH, 5, ADD, PSH, 7, SUB, POP, HLT ];
+    vm.program = [ 
+        s32(InstructionSet::PSH), 5, 
+        s32(InstructionSet::PSH), 5, 
+        s32(InstructionSet::ADD), 
+        s32(InstructionSet::PSH), 7, 
+        s32(InstructionSet::SUB), 
+        s32(InstructionSet::POP), 
+        s32(InstructionSet::HLT) 
+    ];
     vm.ip = 0;
     vm.sp = 0;
     vm.stack = [ 0, 0, 0, 0, 0 ];
