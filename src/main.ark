@@ -1,27 +1,35 @@
 [c] func printf(fmt: str, ...): int;
 
-enum InstructionSet {
+type InstructionSet enum {
     HLT,
     PSH,
     POP,
     ADD,
     SUB
-}
+};
 
-struct VirtualMachine {
-    running: bool,
-    sp: s32,
-    ip: s32,
-    program: []s32,
-    stack: []s32,
-}
+type VirtualMachine struct {
+    running: bool = true,
+    program: []s32 = [ 
+        s32(InstructionSet::PSH), 5, 
+        s32(InstructionSet::PSH), 5, 
+        s32(InstructionSet::ADD), 
+        s32(InstructionSet::PSH), 7, 
+        s32(InstructionSet::SUB), 
+        s32(InstructionSet::POP), 
+        s32(InstructionSet::HLT) 
+    ],
+    ip: s32 = 0,
+    sp: s32 = 0,
+    stack: []s32 = [ 0, 0, 0, 0, 0 ],
+};
 
-func fetch(vm: ^VirtualMachine): s32 {
+func (vm: ^VirtualMachine) fetch(): s32 {
     instr: s32 = vm.program[vm.ip];
     return instr;
 }
 
-func eval(vm: ^VirtualMachine, instr: s32) {
+func (vm: ^VirtualMachine) eval(instr: s32) {
     if instr == s32(InstructionSet::HLT) {
         vm.running = false;
     }
@@ -65,23 +73,12 @@ func eval(vm: ^VirtualMachine, instr: s32) {
 }
 
 func main(): int {
-    vm: VirtualMachine;
-    vm.running = true;
-    vm.program = [ 
-        s32(InstructionSet::PSH), 5, 
-        s32(InstructionSet::PSH), 5, 
-        s32(InstructionSet::ADD), 
-        s32(InstructionSet::PSH), 7, 
-        s32(InstructionSet::SUB), 
-        s32(InstructionSet::POP), 
-        s32(InstructionSet::HLT) 
-    ];
-    vm.ip = 0;
-    vm.sp = 0;
-    vm.stack = [ 0, 0, 0, 0, 0 ];
+    mut no_alloc_vm: VirtualMachine;
+    vm: ^VirtualMachine = &no_alloc_vm;
+    default(^vm);
 
     for vm.running {
-        eval(&vm, fetch(&vm));
+        vm.eval(vm.fetch());
         vm.ip = vm.ip + 1;
     }
 
