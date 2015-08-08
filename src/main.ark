@@ -74,7 +74,7 @@ func (mut vm: ^VirtualMachine) eval(instr: s32) {
 
 func main()  -> int {
     mut no_alloc_vm: VirtualMachine;
-    mut vm: ^VirtualMachine = &no_alloc_vm;
+    mut vm: ^VirtualMachine = ^VirtualMachine(&no_alloc_vm);
     default(^vm);
 
     for vm.running {
