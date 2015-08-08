@@ -1,4 +1,4 @@
-[c] func printf(fmt: str, ...): int;
+[c] func printf(fmt: str, ...) -> int;
 
 type InstructionSet enum {
     HLT,
@@ -24,7 +24,7 @@ type VirtualMachine struct {
     stack: []s32 = [ 0, 0, 0, 0, 0 ],
 };
 
-func (vm: ^VirtualMachine) fetch(): s32 {
+func (vm: ^VirtualMachine) fetch() -> s32 {
     instr: s32 = vm.program[vm.ip];
     return instr;
 }
@@ -72,9 +72,9 @@ func (vm: ^VirtualMachine) eval(instr: s32) {
     }
 }
 
-func main(): int {
+func main()  -> int {
     mut no_alloc_vm: VirtualMachine;
-    vm: ^VirtualMachine = &no_alloc_vm;
+    mut vm: ^VirtualMachine = &no_alloc_vm;
     default(^vm);
 
     for vm.running {
