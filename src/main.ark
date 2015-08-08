@@ -24,12 +24,12 @@ type VirtualMachine struct {
     stack: []s32 = [ 0, 0, 0, 0, 0 ],
 };
 
-func (vm: ^VirtualMachine) fetch() -> s32 {
+func (mut vm: ^VirtualMachine) fetch() -> s32 {
     instr: s32 = vm.program[vm.ip];
     return instr;
 }
 
-func (vm: ^VirtualMachine) eval(instr: s32) {
+func (mut vm: ^VirtualMachine) eval(instr: s32) {
     if instr == s32(InstructionSet::HLT) {
         vm.running = false;
     }
