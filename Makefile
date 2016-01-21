@@ -1,2 +1,2 @@
 all:
-	ark build src --loglevel=verbose
+	ark build -I ./ src --loglevel=verbose

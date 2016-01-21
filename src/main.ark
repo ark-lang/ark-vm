@@ -1,4 +1,4 @@
-[c] func printf(fmt: str, ...) -> int;
+[c] func printf(fmt: ^u8, ...) -> int;
 
 type InstructionSet enum {
     HLT,
@@ -10,18 +10,18 @@ type InstructionSet enum {
 
 type VirtualMachine struct {
     running: bool = true,
-    program: []s32 = [ 
-        s32(InstructionSet::PSH), 5, 
-        s32(InstructionSet::PSH), 5, 
-        s32(InstructionSet::ADD), 
-        s32(InstructionSet::PSH), 7, 
-        s32(InstructionSet::SUB), 
-        s32(InstructionSet::POP), 
-        s32(InstructionSet::HLT) 
-    ],
+    program: []s32 = []s32{
+        s32(InstructionSet::PSH), 5,
+        s32(InstructionSet::PSH), 5,
+        s32(InstructionSet::ADD),
+        s32(InstructionSet::PSH), 7,
+        s32(InstructionSet::SUB),
+        s32(InstructionSet::POP),
+        s32(InstructionSet::HLT)
+    },
     ip: s32 = 0,
     sp: s32 = 0,
-    stack: []s32 = [ 0, 0, 0, 0, 0 ],
+    stack: []s32 = []s32{ 0, 0, 0, 0, 0 },
 };
 
 func (mut vm: ^VirtualMachine) fetch() -> s32 {
@@ -41,7 +41,7 @@ func (mut vm: ^VirtualMachine) eval(instr: s32) {
     else if instr == s32(InstructionSet::POP) {
         val := vm.stack[vm.sp];
         vm.sp = vm.sp - 1;
-        C::printf("POP result: %d\n", val);
+        C::printf(c"POP result: %d\n", val);
     }
     else if instr == s32(InstructionSet::ADD) {
         a := vm.stack[vm.sp];
@@ -51,7 +51,7 @@ func (mut vm: ^VirtualMachine) eval(instr: s32) {
         vm.sp = vm.sp - 1;
 
         result := a + b;
-        C::printf("ADD result: %d\n", result);
+        C::printf(c"ADD result: %d\n", result);
         vm.sp = vm.sp + 1;
         vm.stack[vm.sp] = result;
     }
@@ -63,16 +63,16 @@ func (mut vm: ^VirtualMachine) eval(instr: s32) {
         vm.sp = vm.sp - 1;
 
         result := b - a;
-        C::printf("SUB result: %d\n", result);
+        C::printf(c"SUB result: %d\n", result);
         vm.sp = vm.sp + 1;
         vm.stack[vm.sp] = result;
     }
     else {
-        C::printf("unimplemented instr\n");
+        C::printf(c"unimplemented instr\n");
     }
 }
 
-func main()  -> int {
+pub func main()  -> int {
     mut no_alloc_vm: VirtualMachine;
     mut vm: ^VirtualMachine = ^VirtualMachine(&no_alloc_vm);
     default(^vm);
