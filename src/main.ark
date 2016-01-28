@@ -9,20 +9,31 @@ type InstructionSet enum {
 };
 
 type VirtualMachine struct {
-    running: bool = true,
-    program: []s32 = []s32{
-        s32(InstructionSet::PSH), 5,
-        s32(InstructionSet::PSH), 5,
-        s32(InstructionSet::ADD),
-        s32(InstructionSet::PSH), 7,
-        s32(InstructionSet::SUB),
-        s32(InstructionSet::POP),
-        s32(InstructionSet::HLT)
-    },
-    ip: s32 = 0,
-    sp: s32 = 0,
-    stack: []s32 = []s32{ 0, 0, 0, 0, 0 },
+    running: bool,
+    program: []s32,
+    ip: s32,
+    sp: s32,
+    stack: []s32,
 };
+
+func (VirtualMachine) new() -> VirtualMachine {
+    res := VirtualMachine{
+        running: true,
+        program: []s32{
+            s32(InstructionSet::PSH), 5,
+            s32(InstructionSet::PSH), 5,
+            s32(InstructionSet::ADD),
+            s32(InstructionSet::PSH), 7,
+            s32(InstructionSet::SUB),
+            s32(InstructionSet::POP),
+            s32(InstructionSet::HLT)
+        },
+        ip: 0,
+        sp: 0,
+        stack: []s32{ 0, 0, 0, 0, 0 }
+    };
+    return res;
+}
 
 func (mut vm: ^VirtualMachine) fetch() -> s32 {
     instr: s32 = vm.program[vm.ip];
@@ -73,9 +84,8 @@ func (mut vm: ^VirtualMachine) eval(instr: s32) {
 }
 
 pub func main()  -> int {
-    mut no_alloc_vm: VirtualMachine;
+    mut no_alloc_vm: VirtualMachine = VirtualMachine::new();
     mut vm: ^VirtualMachine = ^VirtualMachine(&no_alloc_vm);
-    default(^vm);
 
     for vm.running {
         vm.eval(vm.fetch());
