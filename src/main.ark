@@ -35,12 +35,12 @@ func (VirtualMachine) new() -> VirtualMachine {
     return res;
 }
 
-func (mut vm: ^VirtualMachine) fetch() -> s32 {
+func (vm: ^mut VirtualMachine) fetch() -> s32 {
     instr: s32 = vm.program[vm.ip];
     return instr;
 }
 
-func (mut vm: ^VirtualMachine) eval(instr: s32) {
+func (vm: ^mut VirtualMachine) eval(instr: s32) {
     if instr == s32(InstructionSet::HLT) {
         vm.running = false;
     }
@@ -85,7 +85,7 @@ func (mut vm: ^VirtualMachine) eval(instr: s32) {
 
 pub func main()  -> int {
     mut no_alloc_vm: VirtualMachine = VirtualMachine::new();
-    mut vm: ^VirtualMachine = ^VirtualMachine(&no_alloc_vm);
+    mut vm: ^mut VirtualMachine = ^mut no_alloc_vm;
 
     for vm.running {
         vm.eval(vm.fetch());
