@@ -41,45 +41,47 @@ func (vm: ^mut VirtualMachine) fetch() -> s32 {
 }
 
 func (vm: ^mut VirtualMachine) eval(instr: s32) {
-    if instr == s32(InstructionSet::HLT) {
-        vm.running = false;
-    }
-    else if instr == s32(InstructionSet::PSH) {
-        vm.ip = vm.ip + 1;
-        vm.sp = vm.sp + 1;
-        vm.stack[vm.sp] = vm.program[vm.ip];
-    }
-    else if instr == s32(InstructionSet::POP) {
-        val := vm.stack[vm.sp];
-        vm.sp = vm.sp - 1;
-        C::printf(c"POP result: %d\n", val);
-    }
-    else if instr == s32(InstructionSet::ADD) {
-        a := vm.stack[vm.sp];
-        vm.sp = vm.sp - 1;
+    match InstructionSet(instr) {
+        HLT => {
+            vm.running = false;
+        },
+        PSH => {
+            vm.ip = vm.ip + 1;
+            vm.sp = vm.sp + 1;
+            vm.stack[vm.sp] = vm.program[vm.ip];
+        },
+        POP => {
+            val := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
+            C::printf(c"POP result: %d\n", val);
+        },
+        ADD => {
+            a := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
 
-        b := vm.stack[vm.sp];
-        vm.sp = vm.sp - 1;
+            b := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
 
-        result := a + b;
-        C::printf(c"ADD result: %d\n", result);
-        vm.sp = vm.sp + 1;
-        vm.stack[vm.sp] = result;
-    }
-    else if instr == s32(InstructionSet::SUB) {
-        a := vm.stack[vm.sp];
-        vm.sp = vm.sp - 1;
+            result := a + b;
+            C::printf(c"ADD result: %d\n", result);
+            vm.sp = vm.sp + 1;
+            vm.stack[vm.sp] = result;
+        },
+        SUB => {
+            a := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
 
-        b := vm.stack[vm.sp];
-        vm.sp = vm.sp - 1;
+            b := vm.stack[vm.sp];
+            vm.sp = vm.sp - 1;
 
-        result := b - a;
-        C::printf(c"SUB result: %d\n", result);
-        vm.sp = vm.sp + 1;
-        vm.stack[vm.sp] = result;
-    }
-    else {
-        C::printf(c"unimplemented instr\n");
+            result := b - a;
+            C::printf(c"SUB result: %d\n", result);
+            vm.sp = vm.sp + 1;
+            vm.stack[vm.sp] = result;
+        },
+        _ => {
+            C::printf(c"unimplemented instr\n");
+        },
     }
 }
 
